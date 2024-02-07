@@ -70,6 +70,7 @@ NULL
 #' @rdname trainNMF
 #' @importFrom Matrix rowSums
 #' @importFrom NMF nmf nmfModel
+#' @importFrom RcppML nmf
 #' @export
 trainNMF <- function(
     x,
@@ -154,9 +155,24 @@ trainNMF <- function(
         nmfModel(W = hw$W, H = hw$H, model = paste0("NMF", model))
     }
 
+   
     # train NMF model
+    # A really stupid way to superimpose actual NMF training into a fake NMFfit object
+    if (verbose) message("Initializing NMF model")
+    mod <- NMF::nmf(matrix(rexp(100), nrow=10), rank=2)
+    
+    # Actual training procedure
     if (verbose) message("Training NMF model")
-    mod <- nmf(x, rank, paste0(model, "NMF"), seed, ...)
+    # mod_2 <- nnmf(x, k=rank, n.threads = 32, init=list(W0=hw$W, H0=hw$H), check.k = FALSE)
+    # mod_2 <- RcppML::nmf(x, k=rank, seed=list(hw$W), tol = 1e-7, mask_zeros=T)
+    mod_2 <- RcppML::nmf(x, k=rank, seed=hw$W, tol = 1e-7, maxit=500)
+    
+    mod_basis <- as.matrix(unname(mod_2$W[,c((rank+1):(2*rank))]))
+    rownames(mod_basis) <- rownames(mod_2$W)
+    colnames(mod_basis) <- paste0("topic_", c(1:rank))
+    
+    coef(mod) <- as.matrix(unname(mod_2$H[c((2*rank+1):(3*rank)),]))
+    basis(mod) <- mod_basis
 
     # capture stop time
     t1 <- Sys.time()

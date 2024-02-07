@@ -1,3 +1,7 @@
+## Why this fork?
+This fork is created because we noticed that the original NMF function implemented is slow to compute deconstruction of large matrices, this fork attempts to implement newer NMF methods in this tool speed up computation
+Based on SPOTlight version 1.5.2
+
 # Welcome to `SPOTlight` <img src="inst/extdata/SPOTlight.png" width="200" align="right"/>
 
 [![Bioconductor Time](https://bioconductor.org/shields/years-in-bioc/SPOTlight.svg)](https://bioconductor.org/packages/release/bioc/html/SPOTlight.html "How long has SPOTlight been in a release of Bioconductor")
